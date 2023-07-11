@@ -1,6 +1,7 @@
 .packages
 .fvm
 .idea
+*/.dart_tool/
 
 # Flutter/Dart/Pub related
 **/doc/api/

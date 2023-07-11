@@ -1,6 +1,6 @@
-import 'package:flutter_apns/flutter_apns.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_apns_only/flutter_apns_only.dart';
 import 'storage.dart';
 
 Future<void> main() async {
@@ -15,7 +15,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final PushConnector connector = createPushConnector();
+  final ApnsPushConnectorOnly connector = ApnsPushConnectorOnly();
   final _messengerKey = GlobalKey<ScaffoldMessengerState>();
   final mySnackbar = SnackBar(
     content: Text("the token was added to the clipboard"),
@@ -25,7 +25,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _register() async {
     final connector = this.connector;
-    connector.configure(
+    connector.configureApns(
       onLaunch: (data) => onPush('onLaunch', data),
       onResume: (data) => onPush('onResume', data),
       onMessage: (data) => onPush('onMessage', data),
@@ -37,31 +37,25 @@ class _MyAppState extends State<MyApp> {
 
     connector.requestNotificationPermissions();
 
-    if (connector is ApnsPushConnector) {
-      connector.shouldPresent = (x) async {
-        final remote = RemoteMessage.fromMap(x.payload);
-        return remote.category == 'MEETING_INVITATION';
-      };
-      connector.setNotificationCategories([
-        UNNotificationCategory(
-          identifier: 'MEETING_INVITATION',
-          actions: [
-            UNNotificationAction(
-              identifier: 'ACCEPT_ACTION',
-              title: 'Accept',
-              options: UNNotificationActionOptions.values,
-            ),
-            UNNotificationAction(
-              identifier: 'DECLINE_ACTION',
-              title: 'Decline',
-              options: [],
-            ),
-          ],
-          intentIdentifiers: [],
-          options: UNNotificationCategoryOptions.values,
-        ),
-      ]);
-    }
+    connector.setNotificationCategories([
+      UNNotificationCategory(
+        identifier: 'MEETING_INVITATION',
+        actions: [
+          UNNotificationAction(
+            identifier: 'ACCEPT_ACTION',
+            title: 'Accept',
+            options: UNNotificationActionOptions.values,
+          ),
+          UNNotificationAction(
+            identifier: 'DECLINE_ACTION',
+            title: 'Decline',
+            options: [],
+          ),
+        ],
+        intentIdentifiers: [],
+        options: UNNotificationCategoryOptions.values,
+      ),
+    ]);
   }
 
   @override
@@ -163,10 +157,10 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-Future<dynamic> onPush(String name, RemoteMessage payload) {
-  storage.append('$name: ${payload.notification?.title}');
+Future<dynamic> onPush(String name, ApnsRemoteMessage data) {
+  storage.append('$name: ${data.payload["title"]}');
 
-  final action = UNNotificationAction.getIdentifier(payload.data);
+  final action = UNNotificationAction.getIdentifier(data.payload);
 
   if (action != null && action != UNNotificationAction.defaultIdentifier) {
     storage.append('Action: $action');
@@ -175,5 +169,5 @@ Future<dynamic> onPush(String name, RemoteMessage payload) {
   return Future.value(true);
 }
 
-Future<dynamic> _onBackgroundMessage(RemoteMessage data) =>
+Future<dynamic> _onBackgroundMessage(ApnsRemoteMessage data) =>
     onPush('onBackgroundMessage', data);

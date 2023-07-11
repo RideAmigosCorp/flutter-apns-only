@@ -1,23 +1,15 @@
 # apns
 
-⛔️ DEPRECATED ⛔️ 
-
-This package is not longer maintained.
-Please write message or GitHub issue if you want to take it over and end deprecated state.
-
-Plugin to implement APNS push notifications on iOS and Firebase on Android.
-
-## Why this plugin was made?
-
-Currently, the only available push notification plugin is `firebase_messaging`. This means that, even on iOS, you will need to setup firebase and communicate with Google to send push notification. This plugin solves the problem by providing native APNS implementation while leaving configured Firebase for Android.
+Plugin to implement APNS push notifications on iOS
 
 ## Usage
-1. Configure firebase on Android according to instructions: https://pub.dartlang.org/packages/firebase_messaging.
+
 2. On iOS, make sure you have correctly configured your app to support push notifications, and that you have generated certificate/token for sending pushes. For more infos see section [How to run example app on iOS](#how-to-run-example-app-on-ios)
 
 3. Add the following lines to the `didFinishLaunchingWithOptions` method in the AppDelegate.m/AppDelegate.swift file of your iOS project
 
 Objective-C:
+
 ```objc
 if (@available(iOS 10.0, *)) {
   [UNUserNotificationCenter currentNotificationCenter].delegate = (id<UNUserNotificationCenterDelegate>) self;
@@ -25,14 +17,16 @@ if (@available(iOS 10.0, *)) {
 ```
 
 Swift:
+
 ```swift
 if #available(iOS 10.0, *) {
   UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
 }
 ```
 
-4. Add `flutter_apns` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/).
+4. Add `flutter_apns_only` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/).
 5. Using `createPushConnector()` method, configure push service according to your needs. `PushConnector` closely resembles `FirebaseMessaging`, so Firebase samples may be useful during implementation. You should create the connector as soon as possible to get the onLaunch callback working on closed app launch.
+
 ```dart
 import 'package:flutter_apns/apns.dart';
 
@@ -44,9 +38,11 @@ connector.configure(
 );
 connector.requestNotificationPermissions()
 ```
-6. Build on device and test your solution using Firebase Console (Android) and CURL (iOS, see [How to run example app on iOS](#how-to-run-example-app-on-ios)).
+
+6. Build on device and test your solution using CURL (iOS, see [How to run example app on iOS](#how-to-run-example-app-on-ios)).
 
 ## Additional APNS features:
+
 ### Displaying notification while in foreground
 
 ```dart
@@ -59,6 +55,7 @@ if (connector is ApnsPushConnector) {
 ### Handling predefined actions
 
 Firstly, configure supported actions:
+
 ```dart
 final connector = createPushConnector();
 if (connector is ApnsPushConnector) {
@@ -85,6 +82,7 @@ if (connector is ApnsPushConnector) {
 ```
 
 Then, handle possible actions in your push handler:
+
 ```dart
 Future<dynamic> onPush(String name, RemoteMessage payload) {
   final action = UNNotificationAction.getIdentifier(payload.data);
@@ -97,25 +95,9 @@ Future<dynamic> onPush(String name, RemoteMessage payload) {
 }
 ```
 
-Note: if user clickes your notification while app is in the background, push will be delivered through onResume without actually waking up the app. Make sure your handling of given action is quick and error free, as execution time in for apps running in the background is very limited.
+Note: if user clicks your notification while app is in the background, push will be delivered through onResume without actually waking up the app. Make sure your handling of given action is quick and error free, as execution time in for apps running in the background is very limited.
 
 Check the example project for fully working code.
-
-## Enabling FirebaseCore
-If you want to use firebase, but not firebase messaging, add this configuration entry in your Info.plist (to avoid MissingPluginException):
-
-```
-<key>flutter_apns.disable_firebase_core</key>
-<false/>
-```
-
-## flutter_apns_only - APNS without firebase
-If only care about apns - use flutter_apns_only plugin. It does not depend on firebase. To ensure no swizzling (which is needed by original plugin to disable firebase) takes place, add this configuration entry in your Info.plist:
-
-```plist
-<key>flutter_apns.disable_swizzling</key>
-<true/>
-```
 
 ## Troubleshooting
 
@@ -123,7 +105,8 @@ If only care about apns - use flutter_apns_only plugin. It does not depend on fi
 2. If onToken method is not being called, add error logging to your AppDelegate, see code below.
 3. Open Console app for macOS, connect your device, and run your app. Search for "PUSH registration failed" string in logs. The error message will tell you what was wrong.
 
-*swift*
+_swift_
+
 ```swift
 import UIKit
 import Flutter
@@ -145,7 +128,8 @@ import Flutter
 
 ```
 
-*objc*
+_objc_
+
 ```objc
 #include "AppDelegate.h"
 #include "GeneratedPluginRegistrant.h"
@@ -165,7 +149,9 @@ import Flutter
 
 @end
 ```
+
 ## How to run example app on iOS
+
 Setting up push notifications on iOS can be tricky since there is no way to permit Apple Push Notification Service (APNS) which requires a complicated certificate setup. The following guide describes a step by step approach to send push notifications from your Mac to an iPhone utilizing the example app of this package. This guide only describes debug environment setup.
 
 1. Open example ios folder with Xcode
@@ -180,25 +166,25 @@ Setting up push notifications on iOS can be tricky since there is no way to perm
 8. Enter description and bundle ID. The latter one needs to be the same as the bundle ID specified in 3.
 9. Select push notification capability
    ![](example/assets/select_capability.png?raw=true)
-11. Press on "Continue" and then on "Register"
-12. Go to https://developer.apple.com/account/resources/certificates and add a new certificate by pressing on the plus-button.
-13. Select 'Apple Push Notification service SSL (Sandbox & Production)'
+10. Press on "Continue" and then on "Register"
+11. Go to https://developer.apple.com/account/resources/certificates and add a new certificate by pressing on the plus-button.
+12. Select 'Apple Push Notification service SSL (Sandbox & Production)'
     ![](example/assets/push_notification_setup.png?raw=true)
-14. Select the app ID that you hav defined in point 4.-10.
-15. Select a Certificate Signing Request (CSR) file. See https://help.apple.com/developer-account/#/devbfa00fef7 on how to create this certificate
-16. When having finished, download the newly created Apple Push Services certificate
-17. Add certificate to your local keychain by opening the newly downloaded file
-18. Press on "login" on the upper left corner of your keychain window and select the tab "My Certificates"
+13. Select the app ID that you hav defined in point 4.-10.
+14. Select a Certificate Signing Request (CSR) file. See https://help.apple.com/developer-account/#/devbfa00fef7 on how to create this certificate
+15. When having finished, download the newly created Apple Push Services certificate
+16. Add certificate to your local keychain by opening the newly downloaded file
+17. Press on "login" on the upper left corner of your keychain window and select the tab "My Certificates"
     ![](example/assets/keychain.png?raw=true)
-19. Right click on the Apple-Push-Services-certificate and export it as .p12-file
-20. Convert p12-file to pem-file by following command. Please consider that "flutterApns" needs to be replaced by your respective certificate name.<br>
+18. Right click on the Apple-Push-Services-certificate and export it as .p12-file
+19. Convert p12-file to pem-file by following command. Please consider that "flutterApns" needs to be replaced by your respective certificate name.<br>
     [More info](https://stackoverflow.com/questions/1762555/creating-pem-file-for-apns)
     ```
     openssl pkcs12 -in flutterApns.p12 -out flutterApns.pem -nodes -clcerts
     ```
-21. Start example app on physical iPhone device from Xcode or your favorite IDE.
-22. Device token gets automatically printed when application was able to retrieve push token from APNS. This happens after accepting notification permission prompt.
-23. Send the following CURL from you development Mac. You can execute CURLs by copy-pasting them into Terminal and hit enter.<br>
+20. Start example app on physical iPhone device from Xcode or your favorite IDE.
+21. Device token gets automatically printed when application was able to retrieve push token from APNS. This happens after accepting notification permission prompt.
+22. Send the following CURL from you development Mac. You can execute CURLs by copy-pasting them into Terminal and hit enter.<br>
     [More info](https://gist.github.com/greencoder/16d1f8d7b0fed5b49cf64312ce2b72cc)
     ```curl
     curl -v \
@@ -209,6 +195,6 @@ Setting up push notifications on iOS can be tricky since there is no way to perm
     --cert <file_path_to_downloaded_signed_and_converted_certificate>.pem \
     https://api.development.push.apple.com/3/device/<device_token>
     ```
-24. A push notification does appear if the example app is in background.
+23. A push notification does appear if the example app is in background.
 
 When not utilizing the example app, you need to additionally [setup push notification capability inside Xcode](https://developer.apple.com/documentation/usernotifications/registering_your_app_with_apns) and add the code mentioned in [usage](#usage).

@@ -14,7 +14,7 @@ dependencies:
   path_provider: ^2.0.11
 
   flutter_local_notifications: ^9.7.0
-  flutter_apns:
+  flutter_apns_only:
 
 dev_dependencies:
   flutter_test:
@@ -24,7 +24,5 @@ flutter:
   uses-material-design: true
 
 dependency_overrides:
-  # flutter_apns_only:
-  # path: ../flutter_apns_only
-  flutter_apns:
-    path: ../flutter_apns
+  flutter_apns_only:
+    path: ../flutter_apns_only
