@@ -97,7 +97,7 @@ packages:
   flutter_apns_only:
     dependency: "direct main"
     description:
-      path: "../flutter_apns_only"
+      path: ".."
       relative: true
     source: path
     version: "1.6.0"
