@@ -196,12 +196,12 @@ func getFlutterError(_ error: Error) -> FlutterError {
     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
   ) -> Bool {
     // we only handle non-fcm messages
-    guard userInfo["gcm.message_id"] != nil else {
-      return
+    guard userInfo["gcm.message_id"] == nil else {
+      return false
     }
 
     guard userInfo["aps"] != nil else {
-      return
+      return false
     }
 
     let userInfo = FlutterApnsSerialization.remoteMessageUserInfo(toDict: userInfo)
@@ -223,7 +223,7 @@ func getFlutterError(_ error: Error) -> FlutterError {
     let userInfo = notification.request.content.userInfo
 
     // we only handle non-fcm messages
-    guard userInfo["gcm.message_id"] != nil else {
+    guard userInfo["gcm.message_id"] == nil else {
       return
     }
 
@@ -236,7 +236,7 @@ func getFlutterError(_ error: Error) -> FlutterError {
     channel.invokeMethod("willPresent", arguments: dict) { (result) in
       let shouldShow = (result as? Bool) ?? false
       if shouldShow {
-        completionHandler([.alert, .sound])
+        completionHandler([.banner, .sound])
       } else {
         completionHandler([])
         let userInfo = FlutterApnsSerialization.remoteMessageUserInfo(toDict: userInfo)
@@ -252,7 +252,7 @@ func getFlutterError(_ error: Error) -> FlutterError {
     var userInfo = response.notification.request.content.userInfo
 
     // we only handle non-fcm messages
-    guard userInfo["gcm.message_id"] != nil else {
+    guard userInfo["gcm.message_id"] == nil else {
       return
     }
 
