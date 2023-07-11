@@ -1,13 +1,13 @@
 .packages
 .fvm
 .idea
-*/.dart_tool/
+.dart_tool
+.flutter-plugins
+.flutter-plugins-dependencies
 
 # Flutter/Dart/Pub related
 **/doc/api/
 */.dart_tool/
-*/.flutter-plugins
-*/.flutter-plugins-dependencies
 */.packages
 */.pub-cache/
 */.pub/
